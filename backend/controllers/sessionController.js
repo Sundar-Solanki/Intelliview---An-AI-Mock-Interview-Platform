@@ -79,7 +79,9 @@ const createSession = asyncHandler(async (req, res) => {
             }
 
             const aiData = await aiResponse.json();
-            const codingCount = interviewType === 'coding-mix' ? Math.floor(count * 0.2) : 0;
+            let codingCount = 0;
+            if (interviewType === 'coding-mix') codingCount = Math.floor(count * 0.2);
+            else if (interviewType === 'coding-only') codingCount = count;
             // C. Map the raw questions into the structured Mongoose sub-document format
             const questionsArray = aiData.questions.map((qText, index) => ({
                 questionText: qText,
@@ -155,9 +157,10 @@ const deleteSession = asyncHandler(async (req, res) => {
     res.status(200).json({ id: req.params.id });
 });
 
-const evaluateAnswerAsync = async (io, userId, sessionId, questionIndex, audioFilePath = null, code = null) => {
-    // Initialize transcription as an empty string instead of null to avoid "null" text in AI prompts
-    let transcription = ""; 
+const evaluateAnswerAsync = async (io, userId, sessionId, questionIndex, audioFilePath = null, code = null, textAnswer = null) => {
+    // Initialize transcription with textAnswer or empty string
+    let transcription = textAnswer || ""; 
+
 
     const questionIdx = typeof questionIndex === 'string' ? parseInt(questionIndex, 10) : questionIndex;
 
@@ -178,7 +181,7 @@ const evaluateAnswerAsync = async (io, userId, sessionId, questionIndex, audioFi
         try {
             pushSocketUpdate(io, userId, sessionId, 'AI_TRANSCRIBING', `Transcribing audio for Q${questionIdx + 1}...`);
             const formData = new FormData();
-            formData.append('file', fs.createReadStream(audioFilePath));
+            formData.append('file', fs.createReadStream(audioFilePath), { filename: 'audio.webm' });
 
             const transResponse = await fetch(`${AI_SERVICE_URL}/transcribe`, {
                 method: 'POST',
@@ -189,7 +192,9 @@ const evaluateAnswerAsync = async (io, userId, sessionId, questionIndex, audioFi
             if (!transResponse.ok) throw new Error('Transcription service failed');
 
             const transData = await transResponse.json();
-            transcription = transData.transcription || "";
+            if (transData.transcription) {
+                transcription = transcription ? `${transcription}\n\n[Audio Transcript]: ${transData.transcription}` : transData.transcription;
+            }
         } catch (error) {
             console.error(`Transcription Error: ${error.message}`);
             // We continue even if transcription fails so the code can still be evaluated
@@ -269,7 +274,7 @@ const evaluateAnswerAsync = async (io, userId, sessionId, questionIndex, audioFi
 // @access  Private
 const submitAnswer = asyncHandler(async (req, res) => {
     const sessionId = req.params.id;
-    const { questionIndex, code } = req.body; // Remove submissionType if not strictly needed
+    const { questionIndex, code, textAnswer } = req.body; // Remove submissionType if not strictly needed
     const userId = req.user._id;
 
     const session = await Session.findById(sessionId);
@@ -310,7 +315,7 @@ const submitAnswer = asyncHandler(async (req, res) => {
     const io = req.app.get('io');
 
     // 3. Start AI processing with BOTH potential inputs
-    evaluateAnswerAsync(io, userId, sessionId, questionIdx, audioFilePath, codeSubmission);
+    evaluateAnswerAsync(io, userId, sessionId, questionIdx, audioFilePath, codeSubmission, textAnswer);
 });
 
 

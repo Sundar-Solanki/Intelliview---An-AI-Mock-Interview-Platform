@@ -26,7 +26,7 @@ const ROLES = [
   "Product Manager"
 ];
 const LEVELS = ["Junior", "Mid-Level", "Senior"];
-const TYPES = [{ label: 'Oral only', value: 'oral-only' }, { label: 'Coding Mix', value: 'coding-mix' }];
+const TYPES = [{ label: 'Oral only', value: 'oral-only' }, { label: 'Coding Mix', value: 'coding-mix' }, { label: 'Coding Only', value: 'coding-only' }];
 const COUNTS = [5, 10, 15];
 
 const Dashboard = () => {
@@ -89,47 +89,47 @@ const Dashboard = () => {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-6 sm:pb-8">
         <div>
-          <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">Welcome, <span className="text-teal-600">{user.name.split(' ')[0]}</span> </h1>
+          <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">Welcome, <span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-600 to-pink-600">{user.name.split(' ')[0]}</span> </h1>
           <p className="text-slate-500 mt-1 text-sm sm:text-lg font-medium">Ready for your technical prep?</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="bg-teal-50 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl border border-teal-100 flex sm:block items-center gap-2">
-            <p className="text-[10px] text-teal-600 font-bold uppercase tracking-wider">Total Sessions</p>
-            <p className="text-xl sm:text-2xl font-black text-teal-700 leading-none">{sessions.length}</p>
+          <div className="bg-fuchsia-50 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl border border-fuchsia-100 flex sm:block items-center gap-2">
+            <p className="text-[10px] text-fuchsia-600 font-bold uppercase tracking-wider">Total Sessions</p>
+            <p className="text-xl sm:text-2xl font-black text-fuchsia-700 leading-none">{sessions.length}</p>
           </div>
         </div>
       </div>
-      <div className="bg-white rounded-2xl sm:rounded-[2.5rem] shadow-xl sm:shadow-2xl shadow-slate-200 border border-slate-100 overflow-hidden">
-        <div className="bg-slate-900 px-6 py-4 sm:px-8 sm:py-6">
+      <div className="bg-white rounded-2xl sm:rounded-[2.5rem] shadow-xl sm:shadow-2xl shadow-fuchsia-200/50 border border-slate-100 overflow-hidden">
+        <div className="bg-gradient-to-r from-violet-600 via-fuchsia-600 to-pink-600 px-6 py-4 sm:px-8 sm:py-6">
           <h2 className="text-lg font-bold text-white flex items-center">
-            <span className="bg-teal-500 w-1.5 h-5 rounded-full mr-3"></span>
+            <span className="bg-white/30 backdrop-blur-sm w-1.5 h-5 rounded-full mr-3"></span>
             New Interview
           </h2>
         </div>
         <form onSubmit={onSubmit} className="p-6 sm:p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 items-end">
           <div className="space-y-1.5">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Role</label>
-            <select name="role" value={formData.role} onChange={onChange} className="w-full bg-slate-50 border-none rounded-xl sm:rounded-2xl p-3 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-teal-500">
+            <select name="role" value={formData.role} onChange={onChange} className="w-full bg-slate-50 border-none rounded-xl sm:rounded-2xl p-3 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-fuchsia-500">
               {ROLES.map((role) => <option key={role} value={role}>{role}</option>)}</select>
           </div>
           <div className="grid grid-cols-2 gap-4 lg:contents">
             <div className="space-y-1.5">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Level</label>
-              <select name="level" value={formData.level} onChange={onChange} className="w-full bg-slate-50 border-none rounded-xl sm:rounded-2xl p-3 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-teal-500">
+              <select name="level" value={formData.level} onChange={onChange} className="w-full bg-slate-50 border-none rounded-xl sm:rounded-2xl p-3 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-fuchsia-500">
                 {LEVELS.map((level) => <option key={level} value={level}>{level}</option>)}</select>
             </div>
             <div className="space-y-1.5">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Length</label>
-              <select name="count" value={formData.count} onChange={onChange} className="w-full bg-slate-50 border-none rounded-xl sm:rounded-2xl p-3 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-teal-500">
+              <select name="count" value={formData.count} onChange={onChange} className="w-full bg-slate-50 border-none rounded-xl sm:rounded-2xl p-3 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-fuchsia-500">
                 {COUNTS.map((count) => <option key={count} value={count}>{count} Qs</option>)}</select>
             </div>
           </div>
           <div className="space-y-1.5">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Type</label>
-            <select name="interviewType" value={formData.interviewType} onChange={onChange} className="w-full bg-slate-50 border-none rounded-xl sm:rounded-2xl p-3 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-teal-500">
+            <select name="interviewType" value={formData.interviewType} onChange={onChange} className="w-full bg-slate-50 border-none rounded-xl sm:rounded-2xl p-3 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-fuchsia-500">
               {TYPES.map((type) => <option key={type.value} value={type.value}>{type.label}</option>)}</select>
           </div>
-          <button type="submit" disabled={isProcessing} className={`w-full h-[48px] rounded-xl font-bold text-white flex items-center justify-center gap-2 ${isProcessing ? 'bg-slate-300' : 'bg-teal-600 hover:bg-teal-700'}`}>
+          <button type="submit" disabled={isProcessing} className={`w-full h-[48px] rounded-xl font-bold text-white flex items-center justify-center gap-2 transition-all ${isProcessing ? 'bg-slate-300' : 'bg-gradient-to-r from-violet-600 to-pink-600 hover:shadow-lg hover:shadow-pink-500/30'}`}>
             {isProcessing ? <><span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span> Generating...</> : <span className="text-sm">Start Interview</span>}
           </button>
         </form>

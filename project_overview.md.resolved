@@ -1,0 +1,147 @@
+# Intelliview (GenAI Interview Simulator) - Project Overview
+
+Welcome to the Intelliview project! This document explains how the entire application works in a simple, easy-to-understand way.
+
+## 🏗️ The 3 Main Components
+
+The project is broken down into three separate pieces that talk to each other:
+
+### 1. The Frontend (User Interface)
+* **Tech Stack:** React, Vite, Tailwind CSS, Redux, Monaco Editor
+* **What it does:** This is what the user sees in their browser. It handles logging in, displaying the dashboard, and running the actual interview interface.
+* **Key Features:** It uses your browser's microphone to record your voice into `.webm` audio files and provides a built-in code editor (Monaco) so you can type out technical solutions. 
+
+### 2. The Backend (The Central Hub)
+* **Tech Stack:** Node.js, Express, MongoDB, Socket.io
+* **What it does:** This is the traffic controller. It saves all the user accounts, interview histories, and questions into the MongoDB database. 
+* **Key Features:** 
+  * When the frontend needs something (like "start an interview"), it asks the backend.
+  * The backend then coordinates with the Python AI Service to get the work done. 
+  * It uses **WebSockets (Socket.io)** to send real-time messages back to the frontend (e.g., "AI is analyzing your answer...").
+
+### 3. The AI Service (The Brain)
+* **Tech Stack:** Python, FastAPI, Whisper, Ollama (Mistral Model)
+* **What it does:** This is where the heavy lifting happens. It has endpoints that the Backend calls to perform AI tasks.
+* **Key Features:**
+  * **Question Generation:** It asks the local Mistral AI model (via Ollama) to generate custom technical questions based on a job role and level.
+  * **Transcription:** When you submit an audio answer, it uses OpenAI's **Whisper** model (running locally) to convert your spoken words into text.
+  * **Evaluation:** It takes your transcribed words and your code, gives them to Mistral, and asks Mistral to act like a strict interviewer to grade you out of 100.
+
+---
+
+## 🔄 How It Works: Step-by-Step
+
+Here is the journey of data when you use the app:
+
+### Phase 1: Starting an Interview
+1. **User Action:** You click "Start Interview" on the Dashboard, selecting "Senior React Developer".
+2. **Frontend -> Backend:** The frontend sends a request to the backend to create a new session.
+3. **Backend -> AI Service:** The backend says, "Hey Python, generate 5 questions for a Senior React Developer."
+4. **AI Service -> Ollama:** Python asks the Mistral model to write the questions, formats them into JSON, and sends them back to the backend.
+5. **Backend -> Database:** The backend saves these questions to MongoDB and tells the frontend the interview is ready.
+
+### Phase 2: Answering a Question
+1. **User Action:** You read Question 1, hit record, talk about your solution, type some code, and hit **Submit Answer**.
+2. **Frontend -> Backend:** The frontend sends your `.webm` audio file and code text to the backend.
+3. **Backend -> AI Service:** The backend temporarily saves your audio in an `uploads/` folder and forwards it to the Python AI service.
+
+### Phase 3: The AI Magic
+1. **Transcription:** The Python service takes your `.webm` audio file and feeds it to the **Whisper** model. Whisper listens to the audio and returns the text of exactly what you said.
+2. **Evaluation:** Python takes the text of what you said + the code you wrote, and sends it to **Mistral**. It asks Mistral: *"Here is the question, here is what they said, here is what they coded. Give them a technical score, a confidence score, and written feedback."*
+3. **AI Service -> Backend:** Python returns the final grades to the backend.
+
+### Phase 4: Final Results
+1. **Backend -> Database:** The backend saves your scores and feedback into MongoDB.
+2. **Backend -> Frontend (WebSockets):** The backend sends a real-time message to your browser saying "Evaluation Complete!".
+3. **Frontend:** Your screen instantly updates to show the AI's feedback and your score out of 100.
+
+---
+
+## 💡 Summary
+- **Frontend** records you.
+- **Backend** manages the database and coordinates.
+- **Python (Whisper)** turns your voice into text.
+- **Python (Mistral)** acts as the intelligent interviewer to write questions and grade your answers.
+
+
+
+
+
+@echo off
+echo Starting AI Interviewer Services...
+
+REM ===============================
+REM Start Backend
+REM ===============================
+start cmd /k "cd backend && npm run dev"
+
+REM ===============================
+REM Start Ollama + Mistral
+REM ===============================
+start cmd /k "ollama run mistral"
+
+REM ===============================
+REM Start AI Service (FastAPI)
+REM ===============================
+start cmd /k "cd ai-service && venv\Scripts\activate && python main.py"
+
+REM ===============================
+REM Start Frontend
+REM ===============================
+start cmd /k "cd frontend && npm run dev"
+
+echo All services launched 🚀
+pause
+
+
+
+@echo off
+echo =====================================
+echo Starting AI Interviewer Services...
+echo =====================================
+
+REM ===============================
+REM Start Backend (Node.js)
+REM ===============================
+start cmd /k ^
+"cd backend ^
+&& echo Installing backend dependencies... ^
+&& npm install ^
+&& echo Starting backend... ^
+&& npm run dev"
+
+REM ===============================
+REM Start Ollama + Mistral
+REM ===============================
+start cmd /k ^
+"echo Pulling Mistral model... ^
+&& ollama pull mistral ^
+&& echo Starting Mistral... ^
+&& ollama run mistral"
+
+REM ===============================
+REM Start AI Service (FastAPI)
+REM ===============================
+start cmd /k ^
+"cd ai-service ^
+&& echo Activating virtual environment... ^
+&& call venv\Scripts\activate ^
+&& echo Installing Python dependencies... ^
+&& pip install -r requirements.txt ^
+&& echo Starting AI service... ^
+&& python main.py"
+
+REM ===============================
+REM Start Frontend (Vite / React)
+REM ===============================
+start cmd /k ^
+"cd frontend ^
+&& echo Installing frontend dependencies... ^
+&& npm install ^
+&& echo Starting frontend... ^
+&& npm run dev"
+
+echo =====================================
+echo All services launched 🚀
+echo =====================================
+pause

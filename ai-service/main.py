@@ -80,6 +80,8 @@ async def generate_questions(request:QuestionResquest):
                 f"The first {coding_count} questions MUST be coding challenge requiring function implementation."
                 f"The remaining {oral_oral} questions MUST be conceptual oral questions."
             )
+        elif request.interview_type=="coding-only":
+            intruction="All questions MUST be coding challenges requiring function implementation. Do Not generate any conceptual oral questions."
         else :
             intruction="All questions MUST be conceptual oral questions. Do Not generate any coding or implementation challenges."
 
@@ -110,24 +112,34 @@ async def generate_questions(request:QuestionResquest):
 
 @app.post("/transcribe")
 async def transcribe_audio(file:UploadFile=File(...)):
+    temp_audio_path = None
     try:
-        audio_bytes=await file.read()
-        audio_in_memory=io.BytesIO(audio_bytes)
-        audio_segment=AudioSegment.from_file(audio_in_memory)
-        with tempfile.NamedTemporaryFile(delete=False,suffix=".mp3") as tmp:
-            temp_audio_path=tmp.name
-            audio_segment.export(temp_audio_path,format="mp3")
+        # Set extension to .webm so FFmpeg can correctly identify the format
+        ext = ".webm"
+            
+        with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp:
+            temp_audio_path = tmp.name
+            # Write bytes directly to temp file
+            content = await file.read()
+            tmp.write(content)
+
         if not WHISPER_MODEL:
             raise HTTPException(status_code=503,detail="Whisper Model is not loaded")
         
-        result=WHISPER_MODEL.transcribe(temp_audio_path)
+        result = WHISPER_MODEL.transcribe(temp_audio_path)
                 
         os.remove(temp_audio_path)
         return {"transcription":result["text"].strip()}
 
     except Exception as e:
-        if 'temp_audio_path' in locals() and os.path.exists(temp_audio_path):
+        if temp_audio_path and os.path.exists(temp_audio_path):
             os.remove(temp_audio_path)
+        import traceback
+        error_msg = f"Transcription failure: {str(e)}\n{traceback.format_exc()}"
+        print(error_msg, flush=True)
+        # Also log to a file so we can see it easily
+        with open("transcribe_error.log", "w") as f:
+            f.write(error_msg)
         raise HTTPException(status_code=500,detail=str(e))
 
 @app.post("/evaluate",response_model=EvaluationResponse)

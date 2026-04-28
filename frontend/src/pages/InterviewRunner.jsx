@@ -169,9 +169,10 @@ function InterviewRunner() {
     const draft = drafts[currentQuestionIndex];
     const code = draft?.code || '';
     const audio = draft?.audioBlob;
+    const textAnswer = draft?.textAnswer || '';
 
-    if (!code && !audio) {
-      toast.warning("Please provide code or an audio answer.");
+    if (!code && !audio && !textAnswer) {
+      toast.warning("Please provide code, an audio answer, or a text explanation.");
       return;
     }
 
@@ -182,6 +183,7 @@ function InterviewRunner() {
     formData.append('questionIndex', currentQuestionIndex);
     if (code) formData.append('code', code);
     if (audio) formData.append('audioFile', audio, 'answer.webm');
+    if (textAnswer) formData.append('textAnswer', textAnswer);
 
     // ✅ 2. Send Request
     dispatch(submitAnswer({ sessionId, formData }))
@@ -243,19 +245,19 @@ function InterviewRunner() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center justify-center min-h-[300px]">
-          <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6">Verbal Answer</h3>
+          <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6">Verbal Answer / Explanation</h3>
 
           {!isRecording && !currentDraft.audioBlob ? (
             <button
               onClick={startRecording}
               disabled={isQuestionLocked}
-              className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-xl hover:scale-105 transition-all disabled:opacity-50 disabled:bg-slate-400 disabled:cursor-not-allowed"
+              className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-xl hover:scale-105 transition-all disabled:opacity-50 disabled:bg-slate-400 disabled:cursor-not-allowed"
             >
               🎤
             </button>
           ) : isRecording ? (
             <div className="text-center">
-              <div className="w-20 h-20 bg-rose-500 rounded-full flex items-center justify-center animate-pulse text-white text-3xl cursor-pointer" onClick={stopRecording}>
+              <div className="w-16 h-16 bg-rose-500 rounded-full flex items-center justify-center animate-pulse text-white text-3xl cursor-pointer" onClick={stopRecording}>
                 ⏹
               </div>
               <p className="mt-4 font-mono text-rose-500 font-bold">{recordingTime}s</p>
@@ -270,6 +272,17 @@ function InterviewRunner() {
               )}
             </div>
           )}
+
+          <div className="w-full text-center text-xs font-bold text-slate-300 uppercase mt-4 mb-2">OR / AND</div>
+          
+          <textarea
+            className="w-full p-4 text-sm border border-slate-200 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-slate-50 disabled:text-slate-400"
+            rows={4}
+            placeholder="Type your explanation here..."
+            disabled={isQuestionLocked}
+            value={currentDraft.textAnswer || ''}
+            onChange={(e) => setDrafts(prev => ({ ...prev, [currentQuestionIndex]: { ...prev[currentQuestionIndex], textAnswer: e.target.value } }))}
+          />
         </div>
 
         <div className="bg-white p-2 rounded-3xl border border-slate-100 shadow-sm overflow-hidden h-[400px]">

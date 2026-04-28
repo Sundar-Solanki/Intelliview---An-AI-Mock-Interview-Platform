@@ -71,7 +71,7 @@ A full-stack application designed to simulate real-world technical interviews. I
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/siddhantsaxenaofficial/ai-interviewer.git
+git clone https://github.com/Sundar-Solanki/Intelliview---An-AI-Mock-Interview-Platform.git
 cd ai-interviewer
 
 ```

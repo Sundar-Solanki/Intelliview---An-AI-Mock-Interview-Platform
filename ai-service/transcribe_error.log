@@ -1,0 +1,46 @@
+Transcription failure: Failed to load audio: ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers
+  built with Apple clang version 21.0.0 (clang-2100.0.123.102)
+  configuration: --prefix=/opt/homebrew/Cellar/ffmpeg/8.1_1 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags= --enable-ffplay --enable-gpl --enable-libsvtav1 --enable-libopus --enable-libx264 --enable-libmp3lame --enable-libdav1d --enable-libvmaf --enable-libvpx --enable-libx265 --enable-openssl --enable-videotoolbox --enable-audiotoolbox --enable-neon
+  libavutil      60. 26.100 / 60. 26.100
+  libavcodec     62. 28.100 / 62. 28.100
+  libavformat    62. 12.100 / 62. 12.100
+  libavdevice    62.  3.100 / 62.  3.100
+  libavfilter    11. 14.100 / 11. 14.100
+  libswscale      9.  5.100 /  9.  5.100
+  libswresample   6.  3.100 /  6.  3.100
+[in#0 @ 0x76701c000] Error opening input: Invalid data found when processing input
+Error opening input file /var/folders/cf/5nksps194t95dn8zmjp1nzb00000gn/T/tmpvshotr9s.
+Error opening input files: Invalid data found when processing input
+
+Traceback (most recent call last):
+  File "/Users/sundarsolanki/Desktop/Projects/AI Interview/AI_INTERVIEWER/ai-service/venv/lib/python3.9/site-packages/whisper/audio.py", line 58, in load_audio
+    out = run(cmd, capture_output=True, check=True).stdout
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ffmpeg', '-nostdin', '-threads', '0', '-i', '/var/folders/cf/5nksps194t95dn8zmjp1nzb00000gn/T/tmpvshotr9s', '-f', 's16le', '-ac', '1', '-acodec', 'pcm_s16le', '-ar', '16000', '-']' returned non-zero exit status 183.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/sundarsolanki/Desktop/Projects/AI Interview/AI_INTERVIEWER/ai-service/main.py", line 127, in transcribe_audio
+    result = WHISPER_MODEL.transcribe(temp_audio_path)
+  File "/Users/sundarsolanki/Desktop/Projects/AI Interview/AI_INTERVIEWER/ai-service/venv/lib/python3.9/site-packages/whisper/transcribe.py", line 139, in transcribe
+    mel = log_mel_spectrogram(audio, model.dims.n_mels, padding=N_SAMPLES)
+  File "/Users/sundarsolanki/Desktop/Projects/AI Interview/AI_INTERVIEWER/ai-service/venv/lib/python3.9/site-packages/whisper/audio.py", line 140, in log_mel_spectrogram
+    audio = load_audio(audio)
+  File "/Users/sundarsolanki/Desktop/Projects/AI Interview/AI_INTERVIEWER/ai-service/venv/lib/python3.9/site-packages/whisper/audio.py", line 60, in load_audio
+    raise RuntimeError(f"Failed to load audio: {e.stderr.decode()}") from e
+RuntimeError: Failed to load audio: ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers
+  built with Apple clang version 21.0.0 (clang-2100.0.123.102)
+  configuration: --prefix=/opt/homebrew/Cellar/ffmpeg/8.1_1 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags= --enable-ffplay --enable-gpl --enable-libsvtav1 --enable-libopus --enable-libx264 --enable-libmp3lame --enable-libdav1d --enable-libvmaf --enable-libvpx --enable-libx265 --enable-openssl --enable-videotoolbox --enable-audiotoolbox --enable-neon
+  libavutil      60. 26.100 / 60. 26.100
+  libavcodec     62. 28.100 / 62. 28.100
+  libavformat    62. 12.100 / 62. 12.100
+  libavdevice    62.  3.100 / 62.  3.100
+  libavfilter    11. 14.100 / 11. 14.100
+  libswscale      9.  5.100 /  9.  5.100
+  libswresample   6.  3.100 /  6.  3.100
+[in#0 @ 0x76701c000] Error opening input: Invalid data found when processing input
+Error opening input file /var/folders/cf/5nksps194t95dn8zmjp1nzb00000gn/T/tmpvshotr9s.
+Error opening input files: Invalid data found when processing input
+
